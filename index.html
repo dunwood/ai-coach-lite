@@ -3,53 +3,137 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>起步 · 一句话生成项目设计书</title>
+  <title>起步 · 零基础 AI 项目导航</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <div id="app">
 
-    <!-- 头部 -->
-    <header class="header">
-      <div class="header-badge">AI 项目设计书助手</div>
-      <h1 class="header-title">起步</h1>
-      <p class="header-subtitle">一句话想法，一份专业设计书</p>
-    </header>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+      <span class="navbar-brand">起步 · 零基础版</span>
+      <a href="https://builder.zhexueyuan.com" target="_blank" class="navbar-link">进阶版</a>
+    </nav>
 
-    <!-- 输入区域 -->
-    <section class="input-section">
-      <div class="input-card">
-        <textarea id="ideaInput"
+    <!-- Hero 区域（首页状态） -->
+    <section class="hero" id="heroSection">
+      <div class="hero-badge">零基础用户的 AI 项目导航</div>
+      <h1 class="hero-title">把你的软件想法<br>一步步变成真正的产品</h1>
+      <p class="hero-desc">不需要会写代码。这里手把手教你：如何把想法整理成设计书，如何用 AI 编程工具把设计书变成能运行的产品——每一步都有指导，所有操作在你自己的电脑和 AI 工具中完成。</p>
+      <button id="startBtn" class="btn-hero">开始做项目</button>
+    </section>
+
+    <!-- 进度条（进入流程后显示） -->
+    <section class="progress-bar" id="progressBar" style="display:none;">
+      <div class="progress-steps">
+        <div class="progress-step active" data-step="1">
+          <span class="step-number">1</span>
+          <span class="step-label">想法→设计书</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="2">
+          <span class="step-number">2</span>
+          <span class="step-label">设计书→拆任务</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="3">
+          <span class="step-number">3</span>
+          <span class="step-label">执行任务→写代码</span>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="4">
+          <span class="step-number">4</span>
+          <span class="step-label">部署上线</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 1：想法 → 设计书 -->
+    <section class="step-section" id="step1" style="display:none;">
+      <div class="step-card">
+        <div class="step-header">
+          <h2>第一步：把想法变成设计书</h2>
+          <p class="step-desc">用一句话描述你想做的东西，我们帮你生成一段专业的 Prompt。你把它复制到 AI 对话工具里，就能得到一份完整的设计书。</p>
+        </div>
+
+        <textarea id="step1Input"
           placeholder="描述你的想法，比如：我想做一个记账的 app..."
           rows="3"
           maxlength="500"></textarea>
         <div class="input-footer">
           <span class="char-count"><span id="charCount">0</span>/500</span>
-          <button id="generateBtn" class="btn-primary">
-            <span class="btn-icon">✨</span> 生成 Prompt
-          </button>
+          <button id="step1GenBtn" class="btn-primary">✨ 生成 Prompt</button>
+        </div>
+
+        <!-- 示例灵感墙 -->
+        <div class="examples-area">
+          <p class="examples-title">💡 不知道做什么？试试这些：</p>
+          <div class="examples-grid" id="examplesGrid"></div>
         </div>
       </div>
     </section>
 
-    <!-- 示例灵感墙 -->
-    <section class="examples-section">
-      <p class="section-label">💡 不知道做什么？试试这些</p>
-      <div class="examples-grid" id="examplesGrid">
-        <!-- 由 app.js 渲染 -->
+    <!-- Step 2：设计书 → 任务拆分 -->
+    <section class="step-section" id="step2" style="display:none;">
+      <div class="step-card">
+        <div class="step-header">
+          <h2>第二步：把设计书拆成任务</h2>
+          <p class="step-desc">把上一步在 AI 中得到的设计书粘贴到下面，我们生成"任务拆分 Prompt"，再复制到 AI 中执行。</p>
+        </div>
+
+        <textarea id="step2Input"
+          placeholder="把 AI 生成的设计书粘贴到这里..."
+          rows="8"></textarea>
+        <div class="input-footer">
+          <button id="step2GenBtn" class="btn-primary">✨ 生成任务拆分 Prompt</button>
+        </div>
       </div>
     </section>
 
-    <!-- Prompt 输出区域（初始隐藏） -->
+    <!-- Step 3：执行任务 → 写代码 -->
+    <section class="step-section" id="step3" style="display:none;">
+      <div class="step-card">
+        <div class="step-header">
+          <h2>第三步：让 AI 帮你写代码</h2>
+          <p class="step-desc">把上一步得到的任务列表粘贴到下面。我们为每个任务生成"执行指令"，你复制到 <strong>TRAE</strong>（代码编辑器）中，AI 会自动帮你创建文件、写代码。</p>
+          <div class="step-tip">
+            <strong>⚡ 重要：</strong>这一步需要用<strong>代码 Agent</strong>（推荐 TRAE），不是大模型对话。代码 Agent 可以直接在你电脑上创建文件和运行代码。
+          </div>
+        </div>
+
+        <textarea id="step3Input"
+          placeholder="把 AI 生成的任务列表粘贴到这里...&#10;&#10;提示：你可以一次粘贴一个 task，也可以全部粘贴"
+          rows="8"></textarea>
+        <div class="input-footer">
+          <button id="step3GenBtn" class="btn-primary">✨ 生成执行指令</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 4：部署上线 -->
+    <section class="step-section" id="step4" style="display:none;">
+      <div class="step-card">
+        <div class="step-header">
+          <h2>第四步：部署上线</h2>
+          <p class="step-desc">代码写完了！现在把项目部署到网上，让别人也能访问。把你的项目情况告诉我们，生成部署指令。</p>
+        </div>
+
+        <textarea id="step4Input"
+          placeholder="简单描述你的项目情况，比如：&#10;- 项目文件夹在 D:\my-project&#10;- 纯 HTML+JS 项目&#10;- 想部署到免费服务器上"
+          rows="6"></textarea>
+        <div class="input-footer">
+          <button id="step4GenBtn" class="btn-primary">✨ 生成部署指令</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prompt 输出区域（通用，每一步共用） -->
     <section class="output-section" id="outputSection" style="display:none;">
       <div class="output-card">
         <div class="output-header">
-          <h2>🎯 你的专属 Prompt 已生成</h2>
-          <p class="output-idea" id="outputIdea"></p>
+          <h3>🎯 Prompt 已生成</h3>
         </div>
-        <div class="output-prompt" id="outputPrompt">
-          <!-- 生成的 Prompt 文本显示在这里 -->
-        </div>
+        <div class="output-prompt" id="outputPrompt"></div>
         <div class="output-actions">
           <button id="copyBtn" class="btn-copy">
             <span id="copyText">📋 一键复制 Prompt</span>
@@ -57,45 +141,48 @@
         </div>
 
         <!-- 使用步骤提示 -->
-        <div class="steps-hint">
-          <div class="step-item">
-            <span class="step-num">①</span>
-            <span>点击上方按钮复制 Prompt</span>
-          </div>
-          <div class="step-item">
-            <span class="step-num">②</span>
-            <span>打开下方任意一个 AI 对话</span>
-          </div>
-          <div class="step-item">
-            <span class="step-num">③</span>
-            <span>粘贴 Prompt，发送，即可得到设计书</span>
-          </div>
+        <div class="steps-hint" id="stepsHint">
+          <!-- 由 app.js 根据当前步骤动态填充 -->
         </div>
 
-        <!-- 大模型入口 -->
-        <div class="ai-platforms" id="aiPlatforms">
-          <!-- 由 app.js 渲染 -->
+        <!-- 工具入口（由 app.js 根据当前步骤动态切换：大模型 or 代码 Agent） -->
+        <div class="tools-area" id="toolsArea"></div>
+
+        <!-- 下一步按钮 -->
+        <div class="next-step-area" id="nextStepArea" style="display:none;">
+          <button id="nextStepBtn" class="btn-next">完成这一步，进入下一步 →</button>
         </div>
       </div>
     </section>
 
-    <!-- 历史记录区域 -->
+    <!-- 完成页面 -->
+    <section class="done-section" id="doneSection" style="display:none;">
+      <div class="done-card">
+        <div class="done-icon">🎉</div>
+        <h2>恭喜！你的项目已经上线了</h2>
+        <p>从一句话想法到真正运行的产品，你做到了！</p>
+        <div class="done-actions">
+          <button id="restartBtn" class="btn-primary">开始新项目</button>
+          <a href="https://builder.zhexueyuan.com" target="_blank" class="btn-secondary-link">想深入学习？试试进阶版 →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 历史记录 -->
     <section class="history-section" id="historySection" style="display:none;">
       <p class="section-label">📋 历史记录</p>
-      <div class="history-list" id="historyList">
-        <!-- 由 app.js 渲染 -->
-      </div>
+      <div class="history-list" id="historyList"></div>
     </section>
 
     <!-- 页脚 -->
     <footer class="footer">
       <p>哲学园出品</p>
-      <p>想要更专业的设计书？试试 <a href="https://builder.zhexueyuan.com" target="_blank">进阶版 →</a></p>
+      <p>想要更专业的全流程？试试 <a href="https://builder.zhexueyuan.com" target="_blank">进阶版 →</a></p>
     </footer>
 
   </div>
 
-  <script src="js/prompt.js"></script>
+  <script src="js/prompts.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/app.js"></script>
 </body>

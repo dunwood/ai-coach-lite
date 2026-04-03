@@ -10,11 +10,12 @@ const Storage = {
     }
   },
 
-  save(idea, prompt) {
+  save(idea, step, prompt) {
     const list = this.getAll();
     const item = {
       id: Date.now(),
       idea: idea,
+      step: step,
       prompt: prompt,
       time: new Date().toISOString()
     };
