@@ -1,4 +1,3 @@
-// 主应用逻辑
 document.addEventListener('DOMContentLoaded', () => {
   // DOM 引用
   const ideaInput = document.getElementById('ideaInput');
@@ -7,24 +6,36 @@ document.addEventListener('DOMContentLoaded', () => {
   const examplesGrid = document.getElementById('examplesGrid');
   const outputSection = document.getElementById('outputSection');
   const outputIdea = document.getElementById('outputIdea');
-  const outputContent = document.getElementById('outputContent');
-  const outputActions = document.getElementById('outputActions');
+  const outputPrompt = document.getElementById('outputPrompt');
   const copyBtn = document.getElementById('copyBtn');
-  const downloadBtn = document.getElementById('downloadBtn');
+  const copyText = document.getElementById('copyText');
+  const aiPlatforms = document.getElementById('aiPlatforms');
   const historySection = document.getElementById('historySection');
   const historyList = document.getElementById('historyList');
 
-  let currentMarkdown = ''; // 当前生成的 Markdown 原文
+  let currentPrompt = '';
 
   // ========== 字数统计 ==========
   ideaInput.addEventListener('input', () => {
     charCount.textContent = ideaInput.value.length;
   });
 
+  // ========== Ctrl+Enter 快捷键 ==========
+  ideaInput.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleGenerate();
+    }
+  });
+
   // ========== 示例灵感墙 ==========
   function renderExamples() {
     examplesGrid.innerHTML = EXAMPLES.map(ex =>
-      `<div class="example-card" data-text="${ex.text}">${ex.emoji} ${ex.text}</div>`
+      `<div class="example-card" data-text="${ex.text}">
+        <span class="example-emoji">${ex.emoji}</span>
+        <span class="example-text">${ex.text}</span>
+        <span class="example-desc">${ex.desc}</span>
+      </div>`
     ).join('');
 
     examplesGrid.addEventListener('click', (e) => {
@@ -37,94 +48,74 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ========== 生成设计书 ==========
-  generateBtn.addEventListener('click', () => {
+  // ========== 大模型入口 ==========
+  function renderPlatforms() {
+    aiPlatforms.innerHTML = AI_PLATFORMS.map(p =>
+      `<a href="${p.url}" target="_blank" class="platform-btn" style="--platform-color: ${p.color}">
+        <span class="platform-name">${p.name}</span>
+        <span class="platform-desc">${p.desc}</span>
+      </a>`
+    ).join('');
+  }
+
+  // ========== 生成 Prompt ==========
+  generateBtn.addEventListener('click', handleGenerate);
+
+  function handleGenerate() {
     const idea = ideaInput.value.trim();
     if (!idea) {
+      ideaInput.classList.add('shake');
+      setTimeout(() => ideaInput.classList.remove('shake'), 400);
       ideaInput.focus();
       return;
     }
-    startGeneration(idea);
-  });
 
-  function startGeneration(idea) {
+    // 生成 Prompt（纯字符串拼接，瞬间完成）
+    currentPrompt = generatePrompt(idea);
+
     // 显示输出区域
     outputSection.style.display = 'block';
-    outputIdea.textContent = `💭 "${idea}"`;
-    outputContent.innerHTML = '<p class="typing-cursor">正在生成...</p>';
-    outputActions.style.display = 'none';
-    currentMarkdown = '';
+    outputIdea.textContent = `💭 你的想法："${idea}"`;
 
-    // 禁用按钮
-    generateBtn.disabled = true;
-    generateBtn.textContent = '生成中...';
-    generateBtn.classList.add('loading');
+    // 显示 Prompt 文本
+    outputPrompt.textContent = currentPrompt;
+
+    // 重置复制按钮状态
+    copyText.textContent = '📋 一键复制 Prompt';
 
     // 滚动到输出区域
-    outputSection.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
 
-    // 调用 API（task02 实现真实调用）
-    Api.generate(
-      idea,
-      // onChunk
-      (text) => {
-        currentMarkdown += text;
-        outputContent.innerHTML = marked.parse(currentMarkdown);
-        // 保持滚动在底部
-        window.scrollTo(0, document.body.scrollHeight);
-      },
-      // onDone
-      (fullText) => {
-        currentMarkdown = fullText;
-        outputContent.innerHTML = marked.parse(fullText);
-        outputActions.style.display = 'flex';
-        resetButton();
-        // 保存到历史记录
-        Storage.save(idea, fullText);
-        renderHistory();
-      },
-      // onError
-      (error) => {
-        outputContent.innerHTML = `<p style="color: red;">生成失败：${error.message}</p><p>请稍后重试。</p>`;
-        resetButton();
-      }
-    );
-  }
-
-  function resetButton() {
-    generateBtn.disabled = false;
-    generateBtn.textContent = '生成设计书';
-    generateBtn.classList.remove('loading');
+    // 保存到历史记录
+    Storage.save(idea, currentPrompt);
+    renderHistory();
   }
 
   // ========== 复制功能 ==========
   copyBtn.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(currentMarkdown);
-      copyBtn.textContent = '已复制 ✓';
-      setTimeout(() => { copyBtn.textContent = '复制'; }, 2000);
+      await navigator.clipboard.writeText(currentPrompt);
+      copyText.textContent = '✅ 已复制！去 AI 对话粘贴吧';
+      setTimeout(() => {
+        copyText.textContent = '📋 一键复制 Prompt';
+      }, 3000);
     } catch {
       // fallback
       const ta = document.createElement('textarea');
-      ta.value = currentMarkdown;
+      ta.value = currentPrompt;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
       document.body.appendChild(ta);
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      copyBtn.textContent = '已复制 ✓';
-      setTimeout(() => { copyBtn.textContent = '复制'; }, 2000);
+      copyText.textContent = '✅ 已复制！去 AI 对话粘贴吧';
+      setTimeout(() => {
+        copyText.textContent = '📋 一键复制 Prompt';
+      }, 3000);
     }
-  });
-
-  // ========== 下载功能 ==========
-  downloadBtn.addEventListener('click', () => {
-    const blob = new Blob([currentMarkdown], { type: 'text/markdown;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '设计书.md';
-    a.click();
-    URL.revokeObjectURL(url);
   });
 
   // ========== 历史记录 ==========
@@ -144,23 +135,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  // 点击历史记录，显示之前的设计书
+  // 点击历史记录
   historyList.addEventListener('click', (e) => {
     const historyItem = e.target.closest('.history-item');
     if (!historyItem) return;
     const id = Number(historyItem.dataset.id);
     const item = Storage.getById(id);
     if (item) {
+      currentPrompt = item.prompt;
       outputSection.style.display = 'block';
-      outputIdea.textContent = `💭 "${item.idea}"`;
-      outputContent.innerHTML = marked.parse(item.markdown);
-      currentMarkdown = item.markdown;
-      outputActions.style.display = 'flex';
-      outputSection.scrollIntoView({ behavior: 'smooth' });
+      outputIdea.textContent = `💭 你的想法："${item.idea}"`;
+      outputPrompt.textContent = item.prompt;
+      copyText.textContent = '📋 一键复制 Prompt';
+      outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   });
 
   // ========== 初始化 ==========
   renderExamples();
+  renderPlatforms();
   renderHistory();
 });

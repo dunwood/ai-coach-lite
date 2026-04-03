@@ -3,72 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>起步 · AI项目设计书生成器</title>
+  <title>起步 · 一句话生成项目设计书</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <div id="app">
 
-<div id="app">
+    <!-- 头部 -->
+    <header class="header">
+      <div class="header-badge">AI 项目设计书助手</div>
+      <h1 class="header-title">起步</h1>
+      <p class="header-subtitle">一句话想法，一份专业设计书</p>
+    </header>
 
-  <!-- 头部 -->
-  <header class="header">
-    <h1 class="header-title">起步</h1>
-    <p class="header-subtitle">一句话，秒出设计书</p>
-  </header>
+    <!-- 输入区域 -->
+    <section class="input-section">
+      <div class="input-card">
+        <textarea id="ideaInput"
+          placeholder="描述你的想法，比如：我想做一个记账的 app..."
+          rows="3"
+          maxlength="500"></textarea>
+        <div class="input-footer">
+          <span class="char-count"><span id="charCount">0</span>/500</span>
+          <button id="generateBtn" class="btn-primary">
+            <span class="btn-icon">✨</span> 生成 Prompt
+          </button>
+        </div>
+      </div>
+    </section>
 
-  <!-- 输入区域 -->
-  <section class="input-section">
-    <textarea id="ideaInput"
-      placeholder="描述你的想法，比如：我想做一个记账的 app..."
-      rows="3"
-      maxlength="500"></textarea>
-    <div class="char-count"><span id="charCount">0</span>/500</div>
-    <button id="generateBtn" class="btn-primary">生成设计书</button>
-  </section>
+    <!-- 示例灵感墙 -->
+    <section class="examples-section">
+      <p class="section-label">💡 不知道做什么？试试这些</p>
+      <div class="examples-grid" id="examplesGrid">
+        <!-- 由 app.js 渲染 -->
+      </div>
+    </section>
 
-  <!-- 示例灵感墙 -->
-  <section class="examples-section">
-    <p class="examples-title">💡 不知道做什么？试试这些：</p>
-    <div class="examples-grid" id="examplesGrid">
-      <!-- 由 app.js 动态渲染 -->
-    </div>
-  </section>
+    <!-- Prompt 输出区域（初始隐藏） -->
+    <section class="output-section" id="outputSection" style="display:none;">
+      <div class="output-card">
+        <div class="output-header">
+          <h2>🎯 你的专属 Prompt 已生成</h2>
+          <p class="output-idea" id="outputIdea"></p>
+        </div>
+        <div class="output-prompt" id="outputPrompt">
+          <!-- 生成的 Prompt 文本显示在这里 -->
+        </div>
+        <div class="output-actions">
+          <button id="copyBtn" class="btn-copy">
+            <span id="copyText">📋 一键复制 Prompt</span>
+          </button>
+        </div>
 
-  <!-- 设计书输出区域（初始隐藏） -->
-  <section class="output-section" id="outputSection" style="display:none;">
-    <div class="output-header">
-      <h2>📄 你的设计书</h2>
-      <div class="output-idea" id="outputIdea"></div>
-    </div>
-    <div class="output-content" id="outputContent">
-      <!-- AI 流式输出渲染到这里 -->
-    </div>
-    <div class="output-actions" id="outputActions" style="display:none;">
-      <button id="copyBtn" class="btn-secondary">复制</button>
-      <button id="downloadBtn" class="btn-secondary">下载 .md</button>
-      <a href="https://builder.zhexueyuan.com" target="_blank" class="btn-link">想要更详细？→ 进阶版</a>
-    </div>
-  </section>
+        <!-- 使用步骤提示 -->
+        <div class="steps-hint">
+          <div class="step-item">
+            <span class="step-num">①</span>
+            <span>点击上方按钮复制 Prompt</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">②</span>
+            <span>打开下方任意一个 AI 对话</span>
+          </div>
+          <div class="step-item">
+            <span class="step-num">③</span>
+            <span>粘贴 Prompt，发送，即可得到设计书</span>
+          </div>
+        </div>
 
-  <!-- 历史记录区域 -->
-  <section class="history-section" id="historySection" style="display:none;">
-    <h2 class="history-title">📋 历史记录</h2>
-    <div class="history-list" id="historyList">
-      <!-- 由 storage.js + app.js 动态渲染 -->
-    </div>
-  </section>
+        <!-- 大模型入口 -->
+        <div class="ai-platforms" id="aiPlatforms">
+          <!-- 由 app.js 渲染 -->
+        </div>
+      </div>
+    </section>
 
-  <!-- 页脚 -->
-  <footer class="footer">
-    <p>哲学园出品 · <a href="https://builder.zhexueyuan.com" target="_blank">进阶版</a></p>
-  </footer>
+    <!-- 历史记录区域 -->
+    <section class="history-section" id="historySection" style="display:none;">
+      <p class="section-label">📋 历史记录</p>
+      <div class="history-list" id="historyList">
+        <!-- 由 app.js 渲染 -->
+      </div>
+    </section>
 
-</div>
+    <!-- 页脚 -->
+    <footer class="footer">
+      <p>哲学园出品</p>
+      <p>想要更专业的设计书？试试 <a href="https://builder.zhexueyuan.com" target="_blank">进阶版 →</a></p>
+    </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="js/prompts.js"></script>
-<script src="js/storage.js"></script>
-<script src="js/api.js"></script>
-<script src="js/app.js"></script>
+  </div>
+
+  <script src="js/prompt.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
