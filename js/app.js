@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toolsArea = document.getElementById('toolsArea');
   const nextStepArea = document.getElementById('nextStepArea');
   const nextStepBtn = document.getElementById('nextStepBtn');
+  const finishBtn = document.getElementById('finishBtn');
   const doneSection = document.getElementById('doneSection');
   const restartBtn = document.getElementById('restartBtn');
   const historySection = document.getElementById('historySection');
@@ -64,6 +65,17 @@ document.addEventListener('DOMContentLoaded', () => {
     progressBar.style.display = 'block';
     updateProgressBar(step);
 
+    // Step 2 显示上下文提示
+    if (step === 2 && currentIdea) {
+      let reminder = step2.querySelector('.context-reminder');
+      if (!reminder) {
+        reminder = document.createElement('div');
+        reminder.className = 'context-reminder';
+        step2.querySelector('.step-header').appendChild(reminder);
+      }
+      reminder.innerHTML = `💭 你的想法是："${currentIdea}"<br>把 AI 生成的设计书粘贴到下方，继续下一步。`;
+    }
+
     // 显示对应步骤
     const stepElements = { 1: step1, 2: step2, 3: step3, 4: step4 };
     if (stepElements[step]) {
@@ -81,12 +93,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ========== 进度条点击跳转 ==========
+  document.querySelectorAll('.progress-step').forEach(el => {
+    el.addEventListener('click', () => {
+      const targetStep = parseInt(el.dataset.step);
+      if (targetStep <= currentStep) {
+        goToStep(targetStep);
+      }
+    });
+  });
+
+  // ========== 返回上一步（事件委托） ==========
+  document.addEventListener('click', (e) => {
+    const backBtn = e.target.closest('.btn-back');
+    if (backBtn) {
+      const targetStep = parseInt(backBtn.dataset.back);
+      goToStep(targetStep);
+    }
+  });
+
   // ========== Step 1 逻辑 ==========
   step1Input.addEventListener('input', () => {
     charCount.textContent = step1Input.value.length;
   });
 
-  // Ctrl+Enter 快捷键
+  // Ctrl+Enter 快捷键（Step 1）
   step1Input.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -95,6 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   step1GenBtn.addEventListener('click', () => handleGenerate(1));
+
+  // Ctrl+Enter 快捷键（Step 2/3/4）
+  [step2Input, step3Input, step4Input].forEach((input, i) => {
+    input.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleGenerate(i + 2);
+      }
+    });
+  });
 
   // 示例灵感墙
   function renderExamples() {
@@ -116,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ========== Step 2/3/4 逻辑 ==========
+  // ========== Step 2/3/4 生成按钮 ==========
   step2GenBtn.addEventListener('click', () => handleGenerate(2));
   step3GenBtn.addEventListener('click', () => handleGenerate(3));
   step4GenBtn.addEventListener('click', () => handleGenerate(4));
@@ -144,34 +185,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 生成 Prompt
     currentPrompt = generatePrompt(step, value);
 
-    // 显示输出
+    // 显示输出（带渐入动画）
     outputSection.style.display = 'block';
+    outputSection.classList.remove('fade-in');
+    void outputSection.offsetWidth; // 强制 reflow 重新触发动画
+    outputSection.classList.add('fade-in');
     outputPrompt.textContent = currentPrompt;
     copyText.textContent = '📋 一键复制 Prompt';
+    copyBtn.classList.remove('copied');
 
     // 根据步骤显示不同的提示和工具
     renderHint(step);
     renderTools(step);
 
-    // 显示/隐藏下一步按钮
+    // 显示/隐藏下一步 or 完成按钮（Bug 1 修复：不再动态创建）
+    nextStepArea.style.display = 'block';
     if (step < 4) {
-      nextStepArea.innerHTML = '';
-      nextStepArea.appendChild(nextStepBtn);
-      nextStepArea.style.display = 'block';
+      nextStepBtn.style.display = 'block';
+      finishBtn.style.display = 'none';
     } else {
-      // Step 4 的"下一步"变成"完成"
-      const doneBtn = document.createElement('button');
-      doneBtn.className = 'btn-next';
-      doneBtn.textContent = '🎉 我已经部署上线了！';
-      doneBtn.addEventListener('click', () => {
-        outputSection.style.display = 'none';
-        doneSection.style.display = 'block';
-        progressBar.style.display = 'none';
-        doneSection.scrollIntoView({ behavior: 'smooth' });
-      });
-      nextStepArea.innerHTML = '';
-      nextStepArea.appendChild(doneBtn);
-      nextStepArea.style.display = 'block';
+      nextStepBtn.style.display = 'none';
+      finishBtn.style.display = 'block';
     }
 
     // 滚动到输出
@@ -236,10 +270,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ========== 复制 ==========
   copyBtn.addEventListener('click', async () => {
+    const onSuccess = () => {
+      copyText.textContent = '✅ 已复制！去工具里粘贴吧';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+        copyText.textContent = '📋 一键复制 Prompt';
+      }, 3000);
+    };
+
     try {
       await navigator.clipboard.writeText(currentPrompt);
-      copyText.textContent = '✅ 已复制！去工具里粘贴吧';
-      setTimeout(() => { copyText.textContent = '📋 一键复制 Prompt'; }, 3000);
+      onSuccess();
     } catch {
       const ta = document.createElement('textarea');
       ta.value = currentPrompt;
@@ -249,8 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      copyText.textContent = '✅ 已复制！去工具里粘贴吧';
-      setTimeout(() => { copyText.textContent = '📋 一键复制 Prompt'; }, 3000);
+      onSuccess();
     }
   });
 
@@ -259,6 +300,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentStep < 4) {
       goToStep(currentStep + 1);
     }
+  });
+
+  // ========== 完成（Step 4）==========
+  finishBtn.addEventListener('click', () => {
+    outputSection.style.display = 'none';
+    doneSection.style.display = 'block';
+    progressBar.style.display = 'none';
+    doneSection.scrollIntoView({ behavior: 'smooth' });
   });
 
   // ========== 重新开始 ==========
@@ -293,11 +342,22 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="history-idea">${item.idea}</span>
         <span class="history-step">第${item.step}步·${stepNames[item.step] || ''}</span>
         <span class="history-date">${date}</span>
+        <button class="history-delete" data-delete-id="${item.id}" title="删除">×</button>
       </div>`;
     }).join('');
   }
 
   historyList.addEventListener('click', (e) => {
+    // 删除按钮
+    const deleteBtn = e.target.closest('.history-delete');
+    if (deleteBtn) {
+      e.stopPropagation();
+      Storage.remove(Number(deleteBtn.dataset.deleteId));
+      renderHistory();
+      return;
+    }
+
+    // 点击历史记录条目
     const historyItem = e.target.closest('.history-item');
     if (!historyItem) return;
     const id = Number(historyItem.dataset.id);
@@ -307,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
       outputSection.style.display = 'block';
       outputPrompt.textContent = item.prompt;
       copyText.textContent = '📋 一键复制 Prompt';
+      copyBtn.classList.remove('copied');
       renderHint(item.step);
       renderTools(item.step);
       nextStepArea.style.display = 'none';

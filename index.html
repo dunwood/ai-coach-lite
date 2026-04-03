@@ -20,6 +20,15 @@
       <div class="hero-badge">零基础用户的 AI 项目导航</div>
       <h1 class="hero-title">把你的软件想法<br>一步步变成真正的产品</h1>
       <p class="hero-desc">不需要会写代码。这里手把手教你：如何把想法整理成设计书，如何用 AI 编程工具把设计书变成能运行的产品——每一步都有指导，所有操作在你自己的电脑和 AI 工具中完成。</p>
+      <div class="hero-flow">
+        <span class="flow-tag">① 想法→设计书</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-tag">② 拆任务</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-tag">③ AI写代码</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-tag">④ 部署上线</span>
+      </div>
       <button id="startBtn" class="btn-hero">开始做项目</button>
     </section>
 
@@ -77,6 +86,7 @@
     <section class="step-section" id="step2" style="display:none;">
       <div class="step-card">
         <div class="step-header">
+          <button class="btn-back" data-back="1">← 返回上一步</button>
           <h2>第二步：把设计书拆成任务</h2>
           <p class="step-desc">把上一步在 AI 中得到的设计书粘贴到下面，我们生成"任务拆分 Prompt"，再复制到 AI 中执行。</p>
         </div>
@@ -94,6 +104,7 @@
     <section class="step-section" id="step3" style="display:none;">
       <div class="step-card">
         <div class="step-header">
+          <button class="btn-back" data-back="2">← 返回上一步</button>
           <h2>第三步：让 AI 帮你写代码</h2>
           <p class="step-desc">把上一步得到的任务列表粘贴到下面。我们为每个任务生成"执行指令"，你复制到 <strong>TRAE</strong>（代码编辑器）中，AI 会自动帮你创建文件、写代码。</p>
           <div class="step-tip">
@@ -114,6 +125,7 @@
     <section class="step-section" id="step4" style="display:none;">
       <div class="step-card">
         <div class="step-header">
+          <button class="btn-back" data-back="3">← 返回上一步</button>
           <h2>第四步：部署上线</h2>
           <p class="step-desc">代码写完了！现在把项目部署到网上，让别人也能访问。把你的项目情况告诉我们，生成部署指令。</p>
         </div>
@@ -151,6 +163,7 @@
         <!-- 下一步按钮 -->
         <div class="next-step-area" id="nextStepArea" style="display:none;">
           <button id="nextStepBtn" class="btn-next">完成这一步，进入下一步 →</button>
+          <button id="finishBtn" class="btn-next btn-finish" style="display:none;">🎉 我已经部署上线了！</button>
         </div>
       </div>
     </section>
