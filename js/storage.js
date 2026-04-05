@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'ai_coach_lite_history';
+const SESSION_KEY = 'ai_coach_lite_session';
 const MAX_HISTORY = 20;
 
 const Storage = {
@@ -14,13 +15,17 @@ const Storage = {
     const list = this.getAll();
     const item = {
       id: Date.now(),
-      idea: idea,
-      step: step,
-      prompt: prompt,
+      idea,
+      step,
+      prompt,
       time: new Date().toISOString()
     };
+
     list.unshift(item);
-    if (list.length > MAX_HISTORY) list.pop();
+    if (list.length > MAX_HISTORY) {
+      list.pop();
+    }
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     return item;
   },
@@ -32,5 +37,21 @@ const Storage = {
 
   getById(id) {
     return this.getAll().find(item => item.id === id) || null;
+  },
+
+  saveSession(session) {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  },
+
+  getSession() {
+    try {
+      return JSON.parse(localStorage.getItem(SESSION_KEY)) || null;
+    } catch {
+      return null;
+    }
+  },
+
+  clearSession() {
+    localStorage.removeItem(SESSION_KEY);
   }
 };

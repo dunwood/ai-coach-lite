@@ -19,17 +19,22 @@
     <section class="hero" id="heroSection">
       <div class="hero-badge">零基础用户的 AI 项目导航</div>
       <h1 class="hero-title">把你的软件想法<br>一步步变成真正的产品</h1>
-      <p class="hero-desc">不需要会写代码。这里手把手教你：如何把想法整理成设计书，如何用 AI 编程工具把设计书变成能运行的产品——每一步都有指导，所有操作在你自己的电脑和 AI 工具中完成。</p>
+      <p class="hero-desc">不需要会写代码。这里手把手教你：如何把想法整理成设计书，如何用 AI 编程工具把设计书变成能运行的产品，每一步都有指导，所有操作都在你自己的电脑和 AI 工具中完成。</p>
       <div class="hero-flow">
         <span class="flow-tag">① 想法→设计书</span>
         <span class="flow-arrow">→</span>
         <span class="flow-tag">② 拆任务</span>
         <span class="flow-arrow">→</span>
-        <span class="flow-tag">③ AI写代码</span>
+        <span class="flow-tag">③ AI 写代码</span>
         <span class="flow-arrow">→</span>
         <span class="flow-tag">④ 部署上线</span>
       </div>
       <button id="startBtn" class="btn-hero">开始做项目</button>
+    </section>
+
+    <section class="page-actions" id="pageActions" style="display:none;">
+      <button id="homeBtn" class="page-action-btn">← 返回首页</button>
+      <button id="prevBtn" class="page-action-btn">← 返回上一页</button>
     </section>
 
     <!-- 进度条（进入流程后显示） -->
@@ -88,7 +93,7 @@
         <div class="step-header">
           <button class="btn-back" data-back="1">← 返回上一步</button>
           <h2>第二步：把设计书拆成任务</h2>
-          <p class="step-desc">把上一步在 AI 中得到的设计书粘贴到下面，我们生成"任务拆分 Prompt"，再复制到 AI 中执行。</p>
+          <p class="step-desc">把上一步在 AI 中得到的设计书粘贴到下面，我们生成“任务拆分 Prompt”，再复制到 AI 中执行。</p>
         </div>
 
         <textarea id="step2Input"
@@ -106,9 +111,9 @@
         <div class="step-header">
           <button class="btn-back" data-back="2">← 返回上一步</button>
           <h2>第三步：让 AI 帮你写代码</h2>
-          <p class="step-desc">把上一步得到的任务列表粘贴到下面。我们为每个任务生成"执行指令"，你复制到 <strong>TRAE</strong>（代码编辑器）中，AI 会自动帮你创建文件、写代码。</p>
+          <p class="step-desc">把上一步得到的任务列表粘贴到下面。我们为每个任务生成“执行指令”，你复制到 <strong>TRAE</strong>（代码编辑器）中，AI 会自动帮你创建文件、写代码。</p>
           <div class="step-tip">
-            <strong>⚡ 重要：</strong>这一步需要用<strong>代码 Agent</strong>（推荐 TRAE），不是大模型对话。代码 Agent 可以直接在你电脑上创建文件和运行代码。
+            <strong>⚡ 重要：</strong>这一步需要用 <strong>代码 Agent</strong>（推荐 TRAE），不是普通大模型对话。代码 Agent 可以直接在你电脑上创建文件和运行代码。
           </div>
         </div>
 
@@ -127,7 +132,7 @@
         <div class="step-header">
           <button class="btn-back" data-back="3">← 返回上一步</button>
           <h2>第四步：部署上线</h2>
-          <p class="step-desc">代码写完了！现在把项目部署到网上，让别人也能访问。把你的项目情况告诉我们，生成部署指令。</p>
+          <p class="step-desc">代码写完了。现在把项目部署到网上，让别人也能访问。把你的项目情况告诉我们，生成部署指令。</p>
         </div>
 
         <textarea id="step4Input"
@@ -153,17 +158,15 @@
         </div>
 
         <!-- 使用步骤提示 -->
-        <div class="steps-hint" id="stepsHint">
-          <!-- 由 app.js 根据当前步骤动态填充 -->
-        </div>
+        <div class="steps-hint" id="stepsHint"></div>
 
-        <!-- 工具入口（由 app.js 根据当前步骤动态切换：大模型 or 代码 Agent） -->
+        <!-- 工具入口 -->
         <div class="tools-area" id="toolsArea"></div>
 
         <!-- 下一步按钮 -->
         <div class="next-step-area" id="nextStepArea" style="display:none;">
           <button id="nextStepBtn" class="btn-next">完成这一步，进入下一步 →</button>
-          <button id="finishBtn" class="btn-next btn-finish" style="display:none;">🎉 我已经部署上线了！</button>
+          <button id="finishBtn" class="btn-next btn-finish" style="display:none;">🎉 我已经部署上线了</button>
         </div>
       </div>
     </section>
@@ -173,7 +176,7 @@
       <div class="done-card">
         <div class="done-icon">🎉</div>
         <h2>恭喜！你的项目已经上线了</h2>
-        <p>从一句话想法到真正运行的产品，你做到了！</p>
+        <p>从一句话想法到真正运行的产品，你做到了。</p>
         <div class="done-actions">
           <button id="restartBtn" class="btn-primary">开始新项目</button>
           <a href="https://builder.zhexueyuan.com" target="_blank" class="btn-secondary-link">想深入学习？试试进阶版 →</a>
